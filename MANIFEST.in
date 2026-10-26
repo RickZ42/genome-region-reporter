@@ -1,0 +1,5 @@
+include LICENSE README.md CONTRIBUTING.md
+recursive-include examples *.bed
+recursive-include tests *.py
+recursive-include docs *.rst *.py
+include .github/workflows/ci.yml
