@@ -28,9 +28,9 @@ From the repository root, with the environment activated:
 regionreport annotate --regions examples/regions.bed --genes examples/genes.bed --repeats examples/repeats.bed --out results/
 ```
 
-`python -m regionreport annotate ...` is an equivalent entry point. Add
+Add
 `--no-plots` to generate CSV files without PNGs. Use a new or empty output
-directory for each run; existing nonempty directories are never overwritten.
+directory for each run; existing nonempty directories are never overwritten (which means [start, end)).
 
 Outputs:
 
@@ -73,17 +73,11 @@ chr1	1000	2000	region_1
   interval per gene; this version does not resolve transcripts/exons into genes.
 - Empty files are valid. Empty annotations yield zero counts; empty regions
   produce header-only CSV files and no PNGs.
-- Blank lines, `#` comments, and standard UCSC `track`/`browser` lines are skipped.
 - Fields after the fourth are ignored, including strand. Overlaps are strand-independent.
 - Chromosome names are matched exactly (`chr1` differs from `1`). All files must
   refer to the same genome assembly; the tool cannot verify assembly identity.
 - BED4 gene and TE records are accepted, not raw GFF3, FASTQ, BAM or VCF files.
 
-Feature counts are counts of annotation IDs, not covered bases. In particular,
-do not add overlap lengths across overlapping TEs and interpret the sum as
-unique TE coverage. Plots clip features to the query region; full feature
-coordinates and IDs remain in the CSV. This version targets small regional
-reports; plotting every feature can create tall figures for dense regions.
 
 See the [UCSC BED specification](https://genome.ucsc.edu/FAQ/FAQformat.html#format1).
 Interval matching uses [Bioframe](https://bioframe.readthedocs.io/en/latest/guide-intervalops.html).
@@ -121,17 +115,11 @@ no-hit regions, safe output filenames, and the installed CLI. The CI workflow
 checks Linux, macOS and Windows on Python 3.12, plus Python 3.10 and 3.14 on
 Linux. It also builds documentation and installs a built wheel before testing.
 
-The `src/` layout and running tests outside the checkout help catch packaging
-problems that an editable local install could hide.
 
-For team contributions, open an issue, work on a branch, and submit a pull
-request describing the change and its validation. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Possible next tasks
 
 - Convert a well-defined subset of GFF3 gene annotations into BED4.
-- Add nearest-gene distances with an explicit distance convention.
 - Compute unique TE coverage using interval unions.
 - Add richer examples and test performance on larger annotation files.
 
-These are extensions, not implemented features. Licensed under the MIT licence.
