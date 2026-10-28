@@ -1,0 +1,4 @@
+# Synthetic teaching data: BED4, zero-based, half-open coordinates.
+chr1	1000	2000	region_1
+chr1	2500	3000	region_2
+chr2	100	200	region_no_hits

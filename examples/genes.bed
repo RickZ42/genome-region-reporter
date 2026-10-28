@@ -1,0 +1,4 @@
+chr1	1200	1800	Gene_A
+chr1	2500	3000	Gene_B
+chr1	3000	3200	Gene_adjacent
+chr2	200	300	Gene_other_adjacent
