@@ -3,8 +3,6 @@
 A small Python library and command-line tool for annotating genomic regions
 with overlapping genes and transposable elements (TEs).
 
-It describes positional overlaps, not biological effects or
-the causes of structural variants. All bundled data are synthetic.
 
 ## Install
 
