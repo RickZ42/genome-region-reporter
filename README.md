@@ -40,9 +40,8 @@ From the repository root, with the environment activated:
 regionreport annotate --regions examples/regions.bed --genes examples/genes.bed --repeats examples/repeats.bed --out results/
 ```
 
-Add
-`--no-plots` to generate CSV files without PNGs. Use a new or empty output
-directory for each run; existing nonempty directories are never overwritten (which means [start, end)).
+Add `--no-plots` to generate CSV files without PNGs. Use a new or empty output
+directory for each run; existing nonempty directories are never overwritten.
 
 Outputs:
 
@@ -53,17 +52,99 @@ Outputs:
 | `plots.csv` | Mapping from original region IDs to numeric PNG filenames |
 | `plots/region_0001.png`, ... | One labelled plot per region, including regions with no hits |
 
-Expected counts for the bundled example:
+## Example data explained
+
+All names and coordinates in the bundled example are synthetic teaching data.
+The three files use the same four tab-separated BED fields, without a header:
+
+| Field | Meaning |
+| --- | --- |
+| `chrom` | Chromosome name |
+| `start` | Start coordinate |
+| `end` | End coordinate |
+| `name` | Region or annotation ID |
+
+### 1. regions.bed: Which regions should we analyse?
+
+[`examples/regions.bed`](examples/regions.bed) contains the regions to investigate:
+
+```text
+chr1	1000	2000	region_1
+chr1	2500	3000	region_2
+chr2	100	200	region_no_hits
+```
+
+The first row means: analyse the interval `[1000, 2000)` on `chr1` and call
+it `region_1`.
+
+BED coordinates are **0-based and half-open**: the start is included and the
+end is excluded. This interval includes positions 1000 through 1999, so its
+length is:
+
+```text
+2000 - 1000 = 1000 bp
+```
+
+The third region deliberately has no overlapping genes or TEs. It checks that
+regions without hits remain in the summary with zero counts, rather than
+disappearing from the results.
+
+### 2. genes.bed: Where are the genes?
+
+[`examples/genes.bed`](examples/genes.bed) uses the same format, with one gene
+per row:
+
+```text
+chr1	1200	1800	Gene_A
+chr1	2500	3000	Gene_B
+chr1	3000	3200	Gene_adjacent
+chr2	200	300	Gene_other_adjacent
+```
+
+For example:
+
+```text
+region_1: [1000, 2000)
+Gene_A:   [1200, 1800)
+```
+
+`Gene_A` lies entirely inside `region_1`, so its overlap length is:
+
+```text
+1800 - 1200 = 600 bp
+```
+
+`Gene_adjacent` starts at 3000, exactly where `region_2` ends. The intervals
+touch but share no bases, so they are adjacent, not overlapping.
+
+This version expects one interval per gene. It does not merge multiple exons
+or transcripts into a single gene record.
+
+### 3. repeats.bed: Where are the TEs?
+
+[`examples/repeats.bed`](examples/repeats.bed) contains the transposable-element
+(TE) annotations:
+
+```text
+chr1	1500	1700	TE_1
+chr1	900	1100	TE_2
+chr1	2700	2800	TE_3
+```
+
+- `TE_1` overlaps `region_1` by 200 bp.
+- `TE_2` crosses the left boundary of `region_1`. Only `[1000, 1100)` lies
+  inside the region, giving an overlap of 100 bp.
+- `TE_3` overlaps `region_2` by 100 bp.
+
+### Expected summary
+
+The complete example therefore produces these counts:
 
 | Region | Genes | TEs |
 | --- | ---: | ---: |
 | `region_1` | 1 | 2 |
 | `region_2` | 1 | 1 |
 | `region_no_hits` | 0 | 0 |
-
-`Gene_A` overlaps `region_1` by 600 bp; `TE_1` overlaps it by 200 bp
-and `TE_2` by 100 bp. A feature starting exactly where a region ends is
-adjacent, not overlapping.
 
 ## Input contract
 
