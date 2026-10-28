@@ -3,6 +3,20 @@
 A small Python library and command-line tool for annotating genomic regions
 with overlapping genes and transposable elements (TEs).
 
+## How it works
+
+The CLI coordinates input validation, overlap analysis and report generation.
+
+```mermaid
+flowchart LR
+    A["Three BED files"] --> B["io.py: Read and validate"]
+    B --> C["analysis.py: Calculate overlaps"]
+    C --> D["report.py: Save results"]
+    D --> E["CSV tables"]
+    D --> F["plotting.py: Generate plots"]
+    G["cli.py: Parse command-line arguments"] --> B
+    G --> D
+```
 
 ## Install
 
