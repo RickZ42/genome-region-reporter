@@ -25,6 +25,10 @@ def test_read_bed_with_comments_and_extra_columns(tmp_path):
         "chr1\t10\t10\tid\n",
         "chr1\t20\t10\tid\n",
         "chr1\t0\t9223372036854775808\tid\n",
+        "chr1\t+1\t10\tid\n",
+        "chr1\t1_0\t20\tid\n",
+        "chr1\t١\t10\tid\n",
+        "chr1\t²\t10\tid\n",
     ],
 )
 def test_bad_bed_reports_line_number(tmp_path, text):
@@ -63,6 +67,17 @@ def test_invalid_dataframe(bed, row):
 def test_duplicate_ids_are_rejected(bed):
     with pytest.raises(ValueError, match="unique"):
         validate_bed(bed([("chr1", 0, 10, "id"), ("chr2", 5, 15, "id")]))
+
+
+def test_names_and_chromosomes_are_trimmed(bed):
+    checked = validate_bed(bed([(" chr1 ", 0, 10, " gene_A ")]))
+    assert checked.loc[0, "chrom"] == "chr1"
+    assert checked.loc[0, "name"] == "gene_A"
+
+
+def test_duplicate_ids_after_trimming_are_rejected(bed):
+    with pytest.raises(ValueError, match="unique"):
+        validate_bed(bed([("chr1", 0, 10, "id"), ("chr2", 5, 15, " id ")]))
 
 
 def test_dataframe_is_copied_and_extra_columns_are_ignored(bed):
