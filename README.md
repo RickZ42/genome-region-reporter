@@ -206,7 +206,8 @@ python -m build
 Tests use hand-calculated interval examples, malformed inputs, empty tables,
 no-hit regions, safe output filenames, and the installed CLI. The CI workflow
 checks Linux, macOS and Windows on Python 3.12, plus Python 3.10 and 3.14 on
-Linux. It also builds documentation and installs a built wheel before testing.
+Linux. It also builds a wheel and the API documentation. Tests use a normal
+package installation, rather than an editable development installation.
 
 
 

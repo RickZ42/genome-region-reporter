@@ -5,10 +5,13 @@ from sysconfig import get_path
 
 import pandas as pd
 import pytest
+from matplotlib.figure import Figure
 
 from regionreport import annotate_regions, write_report
 from regionreport.cli import main
 from regionreport.plotting import plot_region
+
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
 @pytest.fixture
@@ -26,23 +29,21 @@ def inputs(tmp_path):
 
 
 def arguments(inputs, output):
-    return [
-        "annotate",
-        "--regions",
-        str(inputs["regions"]),
-        "--genes",
-        str(inputs["genes"]),
-        "--repeats",
-        str(inputs["repeats"]),
-        "--out",
-        str(output),
-    ]
+    args = ["annotate"]
+    for name in ["regions", "genes", "repeats"]:
+        args.append("--" + name)
+        args.append(str(inputs[name]))
+    args.append("--out")
+    args.append(str(output))
+    return args
 
 
 def test_installed_cli_end_to_end(tmp_path, inputs):
     output = tmp_path / "report"
+    command = [sys.executable, "-m", "regionreport"]
+    command.extend(arguments(inputs, output))
     completed = subprocess.run(
-        [sys.executable, "-m", "regionreport", *arguments(inputs, output)],
+        command,
         capture_output=True,
         text=True,
         check=True,
@@ -51,16 +52,19 @@ def test_installed_cli_end_to_end(tmp_path, inputs):
     summary = pd.read_csv(output / "summary.csv")
     assert summary["gene_count"].tolist() == [1, 0]
     assert summary["te_count"].tolist() == [1, 0]
-    assert sorted(pd.read_csv(output / "overlaps.csv")["overlap_bp"]) == [200, 600]
+    overlaps = pd.read_csv(output / "overlaps.csv")
+    assert sorted(overlaps["overlap_bp"]) == [200, 600]
     plots = pd.read_csv(output / "plots.csv")
     assert plots["region_id"].tolist() == ["region_1", "no_hits"]
     for filename in plots["plot_file"]:
-        assert (output / filename).read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+        assert (output / filename).read_bytes().startswith(PNG_SIGNATURE)
 
 
 def test_no_plots(tmp_path, inputs):
     output = tmp_path / "csv_only"
-    assert main([*arguments(inputs, output), "--no-plots"]) == 0
+    args = arguments(inputs, output)
+    args.append("--no-plots")
+    assert main(args) == 0
     assert not (output / "plots").exists()
     assert pd.read_csv(output / "plots.csv").empty
 
@@ -110,9 +114,31 @@ def test_plot_unknown_region(tmp_path, bed):
         plot_region(result, "unknown", tmp_path / "missing.png")
 
 
+def test_plot_clips_features_and_shortens_long_labels(tmp_path, bed, monkeypatch):
+    regions = bed([("chr1", 100, 200, "region")])
+    genes = bed([("chr1", 80, 130, "gene_" + "A" * 60)])
+    repeats = bed([("chr1", 180, 240, "TE")])
+    result = annotate_regions(regions, genes, repeats)
+
+    def check_figure(figure, path, **kwargs):
+        axis = figure.axes[0]
+        bars = []
+        for bar in axis.patches:
+            bars.append((bar.get_x(), bar.get_width()))
+        # Query first, then TE and gene. Only the intersecting portions are drawn.
+        assert bars == [(100, 100), (180, 20), (100, 30)]
+        gene_label = axis.get_yticklabels()[2].get_text()
+        assert len(gene_label) == 45
+        assert gene_label.endswith("...")
+
+    monkeypatch.setattr(Figure, "savefig", check_figure)
+    plot_region(result, "region", tmp_path / "region.png")
+
+
 def test_console_entry_point():
-    executable = Path(get_path("scripts")) / (
-        "regionreport.exe" if sys.platform == "win32" else "regionreport"
-    )
+    command_name = "regionreport"
+    if sys.platform == "win32":
+        command_name = "regionreport.exe"
+    executable = Path(get_path("scripts")) / command_name
     completed = subprocess.run([str(executable), "--help"], capture_output=True, check=True)
     assert b"annotate" in completed.stdout

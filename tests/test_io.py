@@ -81,7 +81,8 @@ def test_duplicate_ids_after_trimming_are_rejected(bed):
 
 
 def test_dataframe_is_copied_and_extra_columns_are_ignored(bed):
-    frame = bed([("chr1", 0, 10, "id")]).assign(score=0)
+    frame = bed([("chr1", 0, 10, "id")])
+    frame["score"] = 0
     before = frame.copy(deep=True)
     checked = validate_bed(frame)
     checked.loc[0, "start"] = 2

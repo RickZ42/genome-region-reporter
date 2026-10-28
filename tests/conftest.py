@@ -4,11 +4,12 @@ import pandas as pd
 import pytest
 
 
+def make_bed(rows):
+    columns = ["chrom", "start", "end", "name"]
+    return pd.DataFrame(rows, columns=columns)
+
+
 @pytest.fixture
 def bed():
-    """Construct a BED4 DataFrame from rows."""
-
-    def make_bed(rows):
-        return pd.DataFrame(rows, columns=["chrom", "start", "end", "name"])
-
+    """Give tests a function they can call as bed(rows)."""
     return make_bed

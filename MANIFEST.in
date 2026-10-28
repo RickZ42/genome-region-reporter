@@ -1,4 +1,4 @@
-include LICENSE README.md CONTRIBUTING.md
+include LICENSE README.md
 recursive-include examples *.bed
 recursive-include tests *.py
 recursive-include docs *.rst *.py
