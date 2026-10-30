@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "genome-region-reporter"
-version = "0.1.0"
+version = "1.6.0"
 description = "Annotate genomic regions with genes and transposable elements."
 readme = "README.md"
 requires-python = ">=3.10"

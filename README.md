@@ -43,6 +43,9 @@ On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
 For a normal installation without development tools, use `python -m pip install .`.
 The package is not published on PyPI.
 
+Check the installed version with `regionreport --version` or
+`python -m regionreport --version`. See [CHANGELOG.md](CHANGELOG.md) for updates.
+
 ## Run the example
 
 From the repository root, with the environment activated:
@@ -60,12 +63,21 @@ Outputs:
 | --- | --- |
 | `summary.csv` | Region length, unique feature counts, union-covered bases and coverage fractions |
 | `overlaps.csv` | Each overlapping segment, original feature ID, coordinates, strand and label |
-| `plots.csv` | Mapping from original region IDs to numeric PNG filenames |
+| `plots.csv` | Mapping from original region IDs to numeric plot filenames |
 | `plots/region_0001.png`, ... | One labelled plot per region, including regions with no hits |
-| `run.json` | Topology, species label, lengths, track availability and runtime versions |
+| `run.json` | Topology, species label, lengths, track availability, plot settings and runtime versions |
 
 Use `--plot-format svg` or `--plot-format pdf` for vector output. Local plots
 display at most 60 features and explicitly label omissions; CSVs remain complete.
+Set `--max-features 20` to change this limit, for example:
+
+```bash
+regionreport annotate --regions examples/regions.bed --genes examples/genes.bed --repeats examples/repeats.bed --out results-small/ --max-features 20 --plot-format svg
+```
+
+The limit must be a positive integer. It counts features, not overlap segments;
+a circular feature split across the origin still occupies one row. `run.json`
+records the limit, file format and whether plots were enabled.
 
 ## Example data explained
 
@@ -239,6 +251,18 @@ Circular inputs accept either `start > end` or an unwrapped `end > length`, with
 at most one lap. Equal endpoints are ambiguous and rejected; use `[0, length)` for
 the whole sequence. Returned ends are unwrapped and can exceed sequence length.
 Split overlap segments preserve the feature ID and count only once per query.
+
+For BED inputs, provide lengths with `--sequence-lengths lengths.tsv`. This file
+has two columns and no header, for example:
+
+```text
+chr1    5000
+chr2    3000
+```
+
+Lengths must be positive integers. Blank lines and `#` comments are allowed.
+Repeated sequence IDs must agree. Invalid rows report the filename and line
+number; lengths that disagree with GFF3 annotations are also rejected.
 
 `read_gff3` supports plain/gzipped GFF3 and selects `gene` and `pseudogene` rows by
 default. It converts 1-based inclusive coordinates to 0-based half-open, retains

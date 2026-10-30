@@ -1,17 +1,18 @@
 """Command-line entry point for region annotation."""
 
 import argparse
-from pathlib import Path
 
+from regionreport import __version__
 from regionreport.analysis import annotate_regions
 from regionreport.gff import MOBILE_TYPES, read_gff3
-from regionreport.io import read_bed
+from regionreport.io import read_bed, read_sequence_lengths
 from regionreport.report import write_report
 
 
 def main(argv=None):
     """Run the CLI; invalid input is reported by argparse with exit status 2."""
     parser = argparse.ArgumentParser(prog="regionreport", description=__doc__)
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("command", choices=["annotate"])
     parser.add_argument("--regions", required=True, help="Regions BED4 file")
     parser.add_argument("--genes", required=True, help="Genes BED4 or GFF3 file")
@@ -29,7 +30,15 @@ def main(argv=None):
     parser.add_argument("--sequence-lengths", help="Headerless two-column sequence ID/length TSV")
     parser.add_argument("--seqid", action="append", help="Keep this GFF3 sequence ID (repeatable)")
     parser.add_argument("--plot-format", choices=["png", "svg", "pdf"], default="png")
+    parser.add_argument(
+        "--max-features",
+        type=int,
+        default=60,
+        help="Maximum features shown per plot (default: 60); CSVs always stay complete",
+    )
     args = parser.parse_args(argv)
+    if args.max_features < 1:
+        parser.error("--max-features must be a positive integer")
     try:
         regions = read_bed(args.regions, circular=args.circular)
         lengths = {}
@@ -50,16 +59,12 @@ def main(argv=None):
             genes = read_bed(args.genes, circular=args.circular)
             repeats = read_bed(args.repeats, circular=args.circular) if args.repeats else None
         if args.sequence_lengths:
-            for line in Path(args.sequence_lengths).read_text(encoding="utf-8").splitlines():
-                if not line.strip() or line.lstrip().startswith("#"):
-                    continue
-                fields = line.split()
-                if len(fields) != 2:
-                    raise ValueError("Sequence lengths need two columns: sequence ID and length")
-                chrom, text_length = fields
-                length = int(text_length)
+            for chrom, length in read_sequence_lengths(args.sequence_lengths).items():
                 if chrom in lengths and lengths[chrom] != length:
-                    raise ValueError(f"Conflicting sequence length for {chrom}")
+                    raise ValueError(
+                        f"{args.sequence_lengths}: length for {chrom} "
+                        "conflicts with GFF3 annotations"
+                    )
                 lengths[chrom] = length
         result = annotate_regions(
             regions,
@@ -70,7 +75,13 @@ def main(argv=None):
             species=args.species,
         )
         make_plots = not args.no_plots
-        directory = write_report(result, args.out, plots=make_plots, plot_format=args.plot_format)
+        directory = write_report(
+            result,
+            args.out,
+            plots=make_plots,
+            plot_format=args.plot_format,
+            max_features=args.max_features,
+        )
     except (OSError, ValueError) as error:
         parser.error(str(error))
     print(f"Annotated {len(result.summary)} regions. Report: {directory.resolve()}")

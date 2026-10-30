@@ -9,6 +9,35 @@ BED_COLUMNS = ["chrom", "start", "end", "name"]
 MAX_COORDINATE = 2**63 - 1
 
 
+def read_sequence_lengths(path):
+    """Read sequence IDs and positive lengths from a headerless two-column file."""
+    path = Path(path)
+    lengths = {}
+    with path.open(encoding="utf-8-sig") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            text = line.strip()
+            if not text or text.startswith("#"):
+                continue
+            location = f"{path}:{line_number}"
+            fields = text.split()
+            if len(fields) != 2:
+                raise ValueError(f"{location}: expected two columns: sequence ID and length")
+            chrom, length_text = fields
+            if not length_text.isascii() or not length_text.isdigit():
+                raise ValueError(f"{location}: sequence length must be a positive integer")
+            length = int(length_text)
+            if length < 1 or length > MAX_COORDINATE:
+                raise ValueError(
+                    f"{location}: sequence length must be between 1 and {MAX_COORDINATE}"
+                )
+            if chrom in lengths and lengths[chrom] != length:
+                raise ValueError(f"{location}: conflicting sequence length for {chrom}")
+            lengths[chrom] = length
+    if not lengths:
+        raise ValueError(f"{path}: no sequence lengths found")
+    return lengths
+
+
 def read_bed(path, *, circular=False):
     """Read the first four BED columns into a checked pandas DataFrame.
 
