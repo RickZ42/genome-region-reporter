@@ -13,11 +13,14 @@ def write_report(result, output_dir, plots=True, *, plot_format="png", max_featu
     """Write a report to a new or empty directory and return its path.
 
     Existing nonempty directories are refused to protect previous results.
-    ``plots.csv`` maps safe numeric PNG filenames to the original region IDs.
+    ``plots.csv`` maps safe numeric plot filenames to the original region IDs.
+    ``max_features`` limits plotted features only; CSV tables remain complete.
     """
     output_dir = Path(output_dir)
     if plot_format not in {"png", "svg", "pdf"}:
         raise ValueError("plot_format must be png, svg or pdf")
+    if isinstance(max_features, bool) or not isinstance(max_features, int) or max_features < 1:
+        raise ValueError("max_features must be a positive integer")
     if output_dir.exists():
         if not output_dir.is_dir() or any(output_dir.iterdir()):
             raise FileExistsError(f"Output must be a new or empty directory: {output_dir}")
@@ -41,5 +44,7 @@ def write_report(result, output_dir, plots=True, *, plot_format="png", max_featu
         name: version(name) for name in ["bioframe", "pandas", "matplotlib"]
     }
     metadata["plot_format"] = plot_format
+    metadata["plots_enabled"] = bool(plots)
+    metadata["max_features"] = max_features
     (output_dir / "run.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     return output_dir

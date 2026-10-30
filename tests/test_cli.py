@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -67,6 +68,8 @@ def test_no_plots(tmp_path, inputs):
     assert main(args) == 0
     assert not (output / "plots").exists()
     assert pd.read_csv(output / "plots.csv").empty
+    metadata = json.loads((output / "run.json").read_text(encoding="utf-8"))
+    assert metadata["plots_enabled"] is False
 
 
 def test_bad_input_creates_no_report(tmp_path, inputs, capsys):
@@ -142,3 +145,42 @@ def test_console_entry_point():
     executable = Path(get_path("scripts")) / command_name
     completed = subprocess.run([str(executable), "--help"], capture_output=True, check=True)
     assert b"annotate" in completed.stdout
+
+
+def test_cli_feature_limit_keeps_complete_csvs(tmp_path, inputs):
+    output = tmp_path / "limited"
+    args = arguments(inputs, output)
+    args.extend(["--max-features", "1", "--plot-format", "svg"])
+    assert main(args) == 0
+    svg = (output / "plots/region_0001.svg").read_text(encoding="utf-8")
+    assert "Showing 1 of 2 features; CSV is complete." in svg
+    overlaps = pd.read_csv(output / "overlaps.csv")
+    assert set(overlaps["feature_id"]) == {"Gene_A", "TE_1"}
+    summary = pd.read_csv(output / "summary.csv")
+    assert summary.loc[0, "gene_count"] == 1
+    assert summary.loc[0, "te_count"] == 1
+    metadata = json.loads((output / "run.json").read_text(encoding="utf-8"))
+    assert metadata["max_features"] == 1
+    assert metadata["plots_enabled"] is True
+    assert metadata["plot_format"] == "svg"
+
+
+@pytest.mark.parametrize("limit", ["0", "-1", "1.5", "many"])
+def test_cli_invalid_feature_limit_creates_no_report(tmp_path, inputs, capsys, limit):
+    output = tmp_path / "invalid"
+    args = arguments(inputs, output)
+    args.extend(["--max-features", limit])
+    with pytest.raises(SystemExit) as error:
+        main(args)
+    assert error.value.code == 2
+    assert "--max-features" in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("limit", [0, -1, True, 1.5, "3", None])
+def test_report_invalid_feature_limit_creates_no_files(tmp_path, bed, limit):
+    output = tmp_path / "invalid"
+    result = annotate_regions(bed([("c", 0, 10, "query")]), bed([]))
+    with pytest.raises(ValueError, match="max_features must be a positive integer"):
+        write_report(result, output, max_features=limit)
+    assert not output.exists()

@@ -54,6 +54,12 @@ Length files have no header and use positive integers; blank lines and ``#``
 comments are allowed. Invalid rows include a filename and line number in the
 error message. Conflicting lengths for the same sequence are rejected.
 
+Use ``--max-features 20`` to change the default limit of 60 features per plot.
+The limit must be a positive integer. CSV tables remain complete, and circular
+segments belonging to one feature share a row. ``run.json`` records the limit,
+plot format and whether plots were enabled. The Python equivalent is
+``write_report(result, "results", max_features=20)``.
+
 The repository's ``DEMO/README.md`` documents two real-data examples, including
 source URLs, checksums, code, full-chromosome summaries and PNG/SVG images.
 ``plot_overview`` requires contiguous non-overlapping windows on one sequence;

@@ -28,7 +28,15 @@ def main(argv=None):
     parser.add_argument("--sequence-lengths", help="Headerless two-column sequence ID/length TSV")
     parser.add_argument("--seqid", action="append", help="Keep this GFF3 sequence ID (repeatable)")
     parser.add_argument("--plot-format", choices=["png", "svg", "pdf"], default="png")
+    parser.add_argument(
+        "--max-features",
+        type=int,
+        default=60,
+        help="Maximum features shown per plot (default: 60); CSVs always stay complete",
+    )
     args = parser.parse_args(argv)
+    if args.max_features < 1:
+        parser.error("--max-features must be a positive integer")
     try:
         regions = read_bed(args.regions, circular=args.circular)
         lengths = {}
@@ -65,7 +73,13 @@ def main(argv=None):
             species=args.species,
         )
         make_plots = not args.no_plots
-        directory = write_report(result, args.out, plots=make_plots, plot_format=args.plot_format)
+        directory = write_report(
+            result,
+            args.out,
+            plots=make_plots,
+            plot_format=args.plot_format,
+            max_features=args.max_features,
+        )
     except (OSError, ValueError) as error:
         parser.error(str(error))
     print(f"Annotated {len(result.summary)} regions. Report: {directory.resolve()}")

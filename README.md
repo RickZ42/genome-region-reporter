@@ -60,12 +60,21 @@ Outputs:
 | --- | --- |
 | `summary.csv` | Region length, unique feature counts, union-covered bases and coverage fractions |
 | `overlaps.csv` | Each overlapping segment, original feature ID, coordinates, strand and label |
-| `plots.csv` | Mapping from original region IDs to numeric PNG filenames |
+| `plots.csv` | Mapping from original region IDs to numeric plot filenames |
 | `plots/region_0001.png`, ... | One labelled plot per region, including regions with no hits |
-| `run.json` | Topology, species label, lengths, track availability and runtime versions |
+| `run.json` | Topology, species label, lengths, track availability, plot settings and runtime versions |
 
 Use `--plot-format svg` or `--plot-format pdf` for vector output. Local plots
 display at most 60 features and explicitly label omissions; CSVs remain complete.
+Set `--max-features 20` to change this limit, for example:
+
+```bash
+regionreport annotate --regions examples/regions.bed --genes examples/genes.bed --repeats examples/repeats.bed --out results-small/ --max-features 20 --plot-format svg
+```
+
+The limit must be a positive integer. It counts features, not overlap segments;
+a circular feature split across the origin still occupies one row. `run.json`
+records the limit, file format and whether plots were enabled.
 
 ## Example data explained
 
