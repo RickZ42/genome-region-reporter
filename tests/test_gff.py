@@ -101,3 +101,33 @@ def test_circular_gff_cli(tmp_path, gff):
 def test_unknown_sequence_filter_is_rejected(gff):
     with pytest.raises(ValueError, match="not found"):
         read_gff3(gff, seqids=["typo"])
+
+
+def test_length_file_cannot_override_gff_length(tmp_path, gff, capsys):
+    regions = tmp_path / "regions.bed"
+    regions.write_text("c\t90\t10\tquery\n", encoding="utf-8")
+    lengths = tmp_path / "lengths.tsv"
+    lengths.write_text("c\t200\n", encoding="utf-8")
+    output = tmp_path / "report"
+    with pytest.raises(SystemExit) as error:
+        main(
+            [
+                "annotate",
+                "--regions",
+                str(regions),
+                "--genes",
+                str(gff),
+                "--input-format",
+                "gff3",
+                "--seqid",
+                "c",
+                "--circular",
+                "--sequence-lengths",
+                str(lengths),
+                "--out",
+                str(output),
+            ]
+        )
+    assert error.value.code == 2
+    assert "conflicts with GFF3" in capsys.readouterr().err
+    assert not output.exists()

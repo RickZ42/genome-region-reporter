@@ -50,6 +50,9 @@ The CLI exposes ``--input-format gff3``, ``--circular``, ``--species``,
 ``--seqid``, ``--sequence-lengths`` and ``--plot-format png|svg|pdf``. Queries
 remain BED4; GFF3 sequence-region directives supply lengths, or a two-column TSV
 can be supplied. Strand is displayed but does not filter overlaps.
+Length files have no header and use positive integers; blank lines and ``#``
+comments are allowed. Invalid rows include a filename and line number in the
+error message. Conflicting lengths for the same sequence are rejected.
 
 The repository's ``DEMO/README.md`` documents two real-data examples, including
 source URLs, checksums, code, full-chromosome summaries and PNG/SVG images.
@@ -60,7 +63,7 @@ API reference
 -------------
 
 .. automodule:: regionreport.io
-   :members: read_bed, validate_bed
+   :members: read_bed, validate_bed, read_sequence_lengths
 
 .. automodule:: regionreport.analysis
    :members: AnnotationResult, annotate_regions

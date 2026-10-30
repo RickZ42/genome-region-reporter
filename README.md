@@ -238,6 +238,18 @@ call share the chosen topology; process mixed linear/circular replicons separate
 Circular inputs accept either `start > end` or an unwrapped `end > length`, with
 at most one lap. Equal endpoints are ambiguous and rejected; use `[0, length)` for
 the whole sequence. Returned ends are unwrapped and can exceed sequence length.
+
+For BED inputs, provide lengths with `--sequence-lengths lengths.tsv`. This file
+has two columns and no header, for example:
+
+```text
+chr1\t5000
+chr2\t3000
+```
+
+Lengths must be positive integers. Blank lines and `#` comments are allowed.
+Repeated sequence IDs must agree. Invalid rows report the filename and line
+number; lengths that disagree with GFF3 annotations are also rejected.
 Split overlap segments preserve the feature ID and count only once per query.
 
 `read_gff3` supports plain/gzipped GFF3 and selects `gene` and `pseudogene` rows by

@@ -1,11 +1,10 @@
 """Command-line entry point for region annotation."""
 
 import argparse
-from pathlib import Path
 
 from regionreport.analysis import annotate_regions
 from regionreport.gff import MOBILE_TYPES, read_gff3
-from regionreport.io import read_bed
+from regionreport.io import read_bed, read_sequence_lengths
 from regionreport.report import write_report
 
 
@@ -50,16 +49,12 @@ def main(argv=None):
             genes = read_bed(args.genes, circular=args.circular)
             repeats = read_bed(args.repeats, circular=args.circular) if args.repeats else None
         if args.sequence_lengths:
-            for line in Path(args.sequence_lengths).read_text(encoding="utf-8").splitlines():
-                if not line.strip() or line.lstrip().startswith("#"):
-                    continue
-                fields = line.split()
-                if len(fields) != 2:
-                    raise ValueError("Sequence lengths need two columns: sequence ID and length")
-                chrom, text_length = fields
-                length = int(text_length)
+            for chrom, length in read_sequence_lengths(args.sequence_lengths).items():
                 if chrom in lengths and lengths[chrom] != length:
-                    raise ValueError(f"Conflicting sequence length for {chrom}")
+                    raise ValueError(
+                        f"{args.sequence_lengths}: length for {chrom} "
+                        "conflicts with GFF3 annotations"
+                    )
                 lengths[chrom] = length
         result = annotate_regions(
             regions,
