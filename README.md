@@ -43,6 +43,9 @@ On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
 For a normal installation without development tools, use `python -m pip install .`.
 The package is not published on PyPI.
 
+Check the installed version with `regionreport --version` or
+`python -m regionreport --version`. See [CHANGELOG.md](CHANGELOG.md) for updates.
+
 ## Run the example
 
 From the repository root, with the environment activated:
@@ -247,19 +250,19 @@ call share the chosen topology; process mixed linear/circular replicons separate
 Circular inputs accept either `start > end` or an unwrapped `end > length`, with
 at most one lap. Equal endpoints are ambiguous and rejected; use `[0, length)` for
 the whole sequence. Returned ends are unwrapped and can exceed sequence length.
+Split overlap segments preserve the feature ID and count only once per query.
 
 For BED inputs, provide lengths with `--sequence-lengths lengths.tsv`. This file
 has two columns and no header, for example:
 
 ```text
-chr1\t5000
-chr2\t3000
+chr1    5000
+chr2    3000
 ```
 
 Lengths must be positive integers. Blank lines and `#` comments are allowed.
 Repeated sequence IDs must agree. Invalid rows report the filename and line
 number; lengths that disagree with GFF3 annotations are also rejected.
-Split overlap segments preserve the feature ID and count only once per query.
 
 `read_gff3` supports plain/gzipped GFF3 and selects `gene` and `pseudogene` rows by
 default. It converts 1-based inclusive coordinates to 0-based half-open, retains

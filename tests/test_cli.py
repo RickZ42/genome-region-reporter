@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+from importlib.metadata import version
 from pathlib import Path
 from sysconfig import get_path
 
@@ -8,7 +9,7 @@ import pandas as pd
 import pytest
 from matplotlib.figure import Figure
 
-from regionreport import annotate_regions, write_report
+from regionreport import __version__, annotate_regions, write_report
 from regionreport.cli import main
 from regionreport.plotting import plot_region
 
@@ -145,6 +146,34 @@ def test_console_entry_point():
     executable = Path(get_path("scripts")) / command_name
     completed = subprocess.run([str(executable), "--help"], capture_output=True, check=True)
     assert b"annotate" in completed.stdout
+    completed = subprocess.run(
+        [str(executable), "--version"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert completed.stdout.strip() == f"regionreport {__version__}"
+
+
+def test_module_version_needs_no_input_files(tmp_path):
+    completed = subprocess.run(
+        [sys.executable, "-m", "regionreport", "--version"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert completed.stdout.strip() == f"regionreport {__version__}"
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_report_version_matches_installed_package(tmp_path, bed):
+    assert version("genome-region-reporter") == __version__
+    output = tmp_path / "versioned"
+    result = annotate_regions(bed([]), bed([]))
+    write_report(result, output, plots=False)
+    metadata = json.loads((output / "run.json").read_text(encoding="utf-8"))
+    assert metadata["package_version"] == __version__
 
 
 def test_cli_feature_limit_keeps_complete_csvs(tmp_path, inputs):

@@ -2,6 +2,7 @@
 
 import argparse
 
+from regionreport import __version__
 from regionreport.analysis import annotate_regions
 from regionreport.gff import MOBILE_TYPES, read_gff3
 from regionreport.io import read_bed, read_sequence_lengths
@@ -11,6 +12,7 @@ from regionreport.report import write_report
 def main(argv=None):
     """Run the CLI; invalid input is reported by argparse with exit status 2."""
     parser = argparse.ArgumentParser(prog="regionreport", description=__doc__)
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("command", choices=["annotate"])
     parser.add_argument("--regions", required=True, help="Regions BED4 file")
     parser.add_argument("--genes", required=True, help="Genes BED4 or GFF3 file")

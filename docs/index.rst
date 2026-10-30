@@ -15,6 +15,9 @@ Run the bundled synthetic example::
 
    regionreport annotate --regions examples/regions.bed --genes examples/genes.bed --repeats examples/repeats.bed --out results/
 
+Check the package version with ``regionreport --version`` or
+``python -m regionreport --version``; neither command needs input files.
+
 Inputs must be tab-separated BED4 files without a header. Coordinates are
 zero-based and half-open. Names must be unique within each input; genes have
 one interval per gene. Empty inputs are valid. Chromosomes are matched exactly,
