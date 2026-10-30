@@ -1,0 +1,52 @@
+{
+  "species": "Escherichia coli K-12 MG1655",
+  "assembly": "GCF_000005845.2",
+  "sequence": "NC_000913.3",
+  "sequence_length_bp": 4641652,
+  "circular": true,
+  "gene_records": 4651,
+  "gene_types": {
+    "gene": 4506,
+    "pseudogene": 145
+  },
+  "mobile_annotations_supplied": true,
+  "mobile_records": 50,
+  "gene_union_covered_bp": 4143363,
+  "window_bp": 50000,
+  "window_count": 93,
+  "local_regions": [
+    {
+      "chrom": "NC_000913.3",
+      "start": 4635652,
+      "end": 4647652,
+      "region_id": "origin_crossing",
+      "length_bp": 12000,
+      "gene_count": 14,
+      "gene_covered_bp": 10772,
+      "gene_coverage_fraction": 0.8976666666666666,
+      "te_count": 0,
+      "te_covered_bp": 0,
+      "te_coverage_fraction": 0.0
+    },
+    {
+      "chrom": "NC_000913.3",
+      "start": 9386,
+      "end": 22731,
+      "region_id": "mobile_neighborhood",
+      "length_bp": 13345,
+      "gene_count": 19,
+      "gene_covered_bp": 11151,
+      "gene_coverage_fraction": 0.8355938553765455,
+      "te_count": 2,
+      "te_covered_bp": 2113,
+      "te_coverage_fraction": 0.15833645560134882
+    }
+  ],
+  "checks": {
+    "all_genes_counted_once_on_full_chromosome": true,
+    "all_mobile_records_counted_once_on_full_chromosome": true,
+    "gene_union_matches_independent_merge": true,
+    "window_union_sums_to_full_chromosome_union": true,
+    "windows_tile_complete_chromosome": true
+  }
+}

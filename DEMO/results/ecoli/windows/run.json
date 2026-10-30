@@ -1,0 +1,21 @@
+{
+  "species": "Escherichia coli K-12 MG1655",
+  "circular": true,
+  "sequence_lengths": {
+    "NC_000913.3": 4641652
+  },
+  "coordinate_system": "0-based half-open; circular ends unwrapped past sequence length",
+  "mobile_annotations_supplied": true,
+  "gene_records": 4651,
+  "mobile_records": 50,
+  "assembly": "GCF_000005845.2",
+  "source_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz",
+  "annotation_sha256": "68d25735ccde6d37af68613dca57a588ae69423f0ecee99b0f29d596eff7accb",
+  "package_version": "0.1.0",
+  "dependencies": {
+    "bioframe": "0.8.0",
+    "pandas": "3.1.0",
+    "matplotlib": "3.11.2"
+  },
+  "plot_format": "png"
+}

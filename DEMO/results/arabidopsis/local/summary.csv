@@ -1,0 +1,2 @@
+chrom,start,end,region_id,length_bp,gene_count,gene_covered_bp,gene_coverage_fraction,te_count,te_covered_bp,te_coverage_fraction
+NC_003075.7,100000,145000,linear_gene_neighborhood,45000,19,29336,0.6519111111111111,0,0,0.0

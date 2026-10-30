@@ -3,14 +3,25 @@
 A small Python library and command-line tool for annotating genomic regions
 with overlapping genes and transposable elements (TEs).
 
+## Real-data DEMO
+
+[The DEMO folder](DEMO/README.md) includes downloaded annotation snapshots,
+reproducible code, complete-chromosome overview plots and local PNG/SVG figures
+for a circular bacterial chromosome and a linear plant chromosome. It demonstrates
+GFF3 conversion, strand-aware drawing and queries crossing the circular coordinate
+origin. See the demo for source accessions, checksums and validation results.
+
+![Circular bacterial coordinate-origin query](DEMO/results/ecoli/origin_crossing.png)
+
 ## How it works
 
 The CLI coordinates input validation, overlap analysis and report generation.
 
 ```mermaid
 flowchart LR
-    A["Three BED files"] --> B["io.py: Read and validate"]
-    B --> C["analysis.py: Calculate overlaps"]
+    A["BED queries + BED/GFF3 annotations"] --> B["io.py / gff.py: Read and validate"]
+    B --> T["topology.py: Normalize circular coordinates"]
+    T --> C["analysis.py: Calculate overlaps and union coverage"]
     C --> D["report.py: Save results"]
     D --> E["CSV tables"]
     D --> F["plotting.py: Generate plots"]
@@ -47,10 +58,14 @@ Outputs:
 
 | File | Contents |
 | --- | --- |
-| `summary.csv` | Each region's length and numbers of overlapping genes and TEs |
-| `overlaps.csv` | Each overlapping region/feature pair, coordinates and overlap length |
+| `summary.csv` | Region length, unique feature counts, union-covered bases and coverage fractions |
+| `overlaps.csv` | Each overlapping segment, original feature ID, coordinates, strand and label |
 | `plots.csv` | Mapping from original region IDs to numeric PNG filenames |
 | `plots/region_0001.png`, ... | One labelled plot per region, including regions with no hits |
+| `run.json` | Topology, species label, lengths, track availability and runtime versions |
+
+Use `--plot-format svg` or `--plot-format pdf` for vector output. Local plots
+display at most 60 features and explicitly label omissions; CSVs remain complete.
 
 ## Example data explained
 
@@ -148,7 +163,7 @@ The complete example therefore produces these counts:
 
 ## Input contract
 
-All three inputs are tab-separated BED files with at least four columns:
+In the default BED mode, inputs are tab-separated files with at least four columns:
 
 ```text
 chrom    start    end    name
@@ -169,7 +184,12 @@ chr1	1000	2000	region_1
 - Fields after the fourth are ignored, including strand. Overlaps are strand-independent.
 - Chromosome names are matched exactly (`chr1` differs from `1`). All files must
   refer to the same genome assembly; the tool cannot verify assembly identity.
-- BED4 gene and TE records are accepted, not raw GFF3, FASTQ, BAM or VCF files.
+- GFF3 annotation inputs are accepted with `--input-format gff3`; queries still
+  use BED4. FASTQ, BAM and VCF are not annotation inputs.
+- `--repeats` is optional. Omitting it records an unavailable mobile-element
+  track, rather than evidence that no mobile elements exist.
+- The coordinate ordering above describes linear mode. Circular queries may use
+  wrapped endpoints with `--circular`; see the explicit contract below.
 
 
 See the [UCSC BED specification](https://genome.ucsc.edu/FAQ/FAQformat.html#format1).
@@ -193,6 +213,45 @@ write_report(result, "results-api", plots=True)
 `annotate_regions` accepts BED4 pandas DataFrames without reading or writing
 files, and leaves its inputs unchanged. `read_bed` and `write_report` handle I/O.
 
+## GFF3 and circular sequences
+
+```python
+from regionreport import annotate_regions, read_bed, read_gff3
+from regionreport.gff import MOBILE_TYPES
+
+source = "DEMO/data/raw/ecoli_MG1655.gff.gz"
+genes = read_gff3(source, seqids=["NC_000913.3"])
+mobile = read_gff3(source, feature_types=MOBILE_TYPES, seqids=["NC_000913.3"])
+result = annotate_regions(
+    read_bed("DEMO/data/processed/ecoli/local_regions.bed", circular=True),
+    genes,
+    mobile,
+    circular=True,
+    sequence_lengths=genes.attrs["sequence_lengths"],
+    species="Escherichia coli K-12 MG1655",
+)
+```
+
+`species` is a display/metadata label, not a topology heuristic. `circular=True`
+requires a mapping of every input sequence ID to its length. All sequences in one
+call share the chosen topology; process mixed linear/circular replicons separately.
+Circular inputs accept either `start > end` or an unwrapped `end > length`, with
+at most one lap. Equal endpoints are ambiguous and rejected; use `[0, length)` for
+the whole sequence. Returned ends are unwrapped and can exceed sequence length.
+Split overlap segments preserve the feature ID and count only once per query.
+
+`read_gff3` supports plain/gzipped GFF3 and selects `gene` and `pseudogene` rows by
+default. It converts 1-based inclusive coordinates to 0-based half-open, retains
+strand/display label/source type, and does not also count child CDS/exon records.
+Multipart selected IDs are explicitly rejected rather than collapsed to bounding
+spans. Strand is displayed, but overlap matching remains strand-independent.
+Gene-span coverage includes introns; it is not coding-sequence coverage.
+
+CLI equivalents are `--input-format gff3`, `--circular`, `--species`, and optional
+`--seqid` filtering. Lengths are read from GFF3 `##sequence-region` directives or
+provided in a headerless two-column TSV with `--sequence-lengths`. Conflicting
+length declarations are rejected. See [DEMO instructions](DEMO/README.md).
+
 ## Development
 
 ```bash
@@ -213,7 +272,7 @@ package installation, rather than an editable development installation.
 
 ## Possible next tasks
 
-- Convert a well-defined subset of GFF3 gene annotations into BED4.
-- Compute unique TE coverage using interval unions.
-- Add richer examples and test performance on larger annotation files.
+- Support multipart selected GFF3 features without merging intervening gaps.
+- Support mixed sequence topologies within one API call.
+- Benchmark much larger multi-genome annotations and add configurable track types.
 

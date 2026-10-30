@@ -9,10 +9,11 @@ BED_COLUMNS = ["chrom", "start", "end", "name"]
 MAX_COORDINATE = 2**63 - 1
 
 
-def read_bed(path):
+def read_bed(path, *, circular=False):
     """Read the first four BED columns into a checked pandas DataFrame.
 
     Blank lines, comments and browser settings are skipped. Empty files are valid.
+    circular=True permits wrapped start > end; annotate_regions checks lengths.
     """
     path = Path(path)
     rows = []
@@ -49,19 +50,21 @@ def read_bed(path):
 
             start = int(start_text)
             end = int(end_text)
-            if start >= end or end > MAX_COORDINATE:
-                raise ValueError(f"{location}: require 0 <= start < end <= {MAX_COORDINATE}")
+            invalid_order = start == end if circular else start >= end
+            if invalid_order or max(start, end) > MAX_COORDINATE:
+                contract = "distinct nonnegative endpoints" if circular else "0 <= start < end"
+                raise ValueError(f"{location}: require {contract}, both <= {MAX_COORDINATE}")
 
             rows.append((chrom, start, end, name))
 
     frame = pd.DataFrame(rows, columns=BED_COLUMNS)
     try:
-        return validate_bed(frame)
+        return validate_bed(frame, circular=circular)
     except ValueError as error:
         raise ValueError(f"{path}: {error}") from error
 
 
-def validate_bed(frame):
+def validate_bed(frame, *, circular=False):
     """Check BED columns and values, returning a copy with integer coordinates."""
     if not isinstance(frame, pd.DataFrame):
         raise TypeError("BED data must be a pandas DataFrame")
@@ -73,7 +76,8 @@ def validate_bed(frame):
             raise ValueError("BED data needs chrom, start, end and name columns")
 
     # Work on a copy so the original table is not changed.
-    result = frame[BED_COLUMNS].copy()
+    optional = [col for col in ["strand", "label", "annotation_type"] if col in frame.columns]
+    result = frame[BED_COLUMNS + optional].copy()
     result = result.reset_index(drop=True)
 
     # Check text fields and remove spaces at their edges.
@@ -102,8 +106,16 @@ def validate_bed(frame):
                 raise ValueError("BED coordinates must be nonnegative signed 64-bit integers")
         result[column] = result[column].astype("int64")
 
-    if (result["start"] >= result["end"]).any():
-        raise ValueError("BED intervals must have start < end")
+    invalid = result["start"] == result["end"] if circular else result["start"] >= result["end"]
+    if invalid.any():
+        message = "distinct endpoints in circular mode" if circular else "start < end"
+        raise ValueError(f"BED intervals must have {message}")
+
+    for column in optional:
+        if not result[column].map(lambda value: isinstance(value, str)).all():
+            raise ValueError(f"BED {column} values must be strings")
+    if "strand" in result and not result["strand"].isin(["+", "-", ".", "?"]).all():
+        raise ValueError("BED strand must be +, -, . or ?")
 
     # Keep consistent text-column types, including when the table is empty.
     result["chrom"] = result["chrom"].astype("object")
