@@ -1,0 +1,39 @@
+{
+  "species": "Arabidopsis thaliana / chromosome 4",
+  "assembly": "GCF_000001735.4",
+  "sequence": "NC_003075.7",
+  "sequence_length_bp": 18585056,
+  "circular": false,
+  "gene_records": 5842,
+  "gene_types": {
+    "gene": 5007,
+    "pseudogene": 835
+  },
+  "mobile_annotations_supplied": false,
+  "mobile_records": null,
+  "gene_union_covered_bp": 11878081,
+  "window_bp": 100000,
+  "window_count": 186,
+  "local_regions": [
+    {
+      "chrom": "NC_003075.7",
+      "start": 100000,
+      "end": 145000,
+      "region_id": "linear_gene_neighborhood",
+      "length_bp": 45000,
+      "gene_count": 19,
+      "gene_covered_bp": 29336,
+      "gene_coverage_fraction": 0.6519111111111111,
+      "te_count": 0,
+      "te_covered_bp": 0,
+      "te_coverage_fraction": 0.0
+    }
+  ],
+  "checks": {
+    "all_genes_counted_once_on_full_chromosome": true,
+    "all_mobile_records_counted_once_on_full_chromosome": true,
+    "gene_union_matches_independent_merge": true,
+    "window_union_sums_to_full_chromosome_union": true,
+    "windows_tile_complete_chromosome": true
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "generated_utc": "2026-10-29T23:28:52.421700+00:00",
+  "python": "3.12.14",
+  "versions": {
+    "genome-region-reporter": "0.1.0",
+    "bioframe": "0.8.0",
+    "pandas": "3.1.0",
+    "matplotlib": "3.11.2"
+  },
+  "sources": [
+    {
+      "key": "ecoli",
+      "file": "raw/ecoli_MG1655.gff.gz",
+      "species": "Escherichia coli K-12 MG1655",
+      "assembly": "GCF_000005845.2",
+      "build": "ASM584v2",
+      "seqid": "NC_000913.3",
+      "circular": true,
+      "window_bp": 50000,
+      "source_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz",
+      "retrieved_utc": "2026-10-29",
+      "content_sha256": "68d25735ccde6d37af68613dca57a588ae69423f0ecee99b0f29d596eff7accb",
+      "source_content_sha256": "68d25735ccde6d37af68613dca57a588ae69423f0ecee99b0f29d596eff7accb",
+      "selection": "Complete original GFF3, unmodified.",
+      "mobile_track_supplied": true
+    },
+    {
+      "key": "arabidopsis",
+      "file": "raw/arabidopsis_chr4.gff.gz",
+      "species": "Arabidopsis thaliana / chromosome 4",
+      "assembly": "GCF_000001735.4",
+      "build": "TAIR10.1",
+      "seqid": "NC_003075.7",
+      "circular": false,
+      "window_bp": 100000,
+      "source_url": "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.4_TAIR10.1/GCF_000001735.4_TAIR10.1_genomic.gff.gz",
+      "retrieved_utc": "2026-10-29",
+      "content_sha256": "3457deff13d7503acfc8dca59ebfb167b256d223cc438ce4cb7db7aaafdf7dca",
+      "source_content_sha256": "63d0744c0a02bffc23b72283ebabeeef39a3e7e6283acec864656fde8eafefb3",
+      "selection": "Only NC_003075.7 records and matching sequence-region directive; gene/exon/CDS records retained.",
+      "mobile_track_supplied": false
+    }
+  ],
+  "implementation_sha256": {
+    "__init__.py": "8b3a176d684e0322e1c78889244b537dc8f282aee69281b6f499d7682edbc28a",
+    "__main__.py": "e7e75ec0a258951e269ba33c4e97d8e0ac7122eb53941d4939229ea261a002dd",
+    "analysis.py": "7a9353599ee53e426498e6da5dc8cbe59d58de5298086eeb1367c2536c09b6c1",
+    "cli.py": "ac471beeec85fd95c21661ed43fcd9d4cec973bb126e92f5697a281e524e590f",
+    "gff.py": "c09c3f1e4e899c71fea6aea0b5283561a54d1c8cf63d6a53aa7adbfca68a5d94",
+    "io.py": "54b2573b1f548127ef8f1cc2e42ca6f0d5cc649cd984e238aee1c1702be3d7ec",
+    "plotting.py": "0ef3665b6dcd44632d8a147ab865b4506b656308bf5b75bd452d6f6c5b8cc5fa",
+    "report.py": "6bf82576292a5afd1c7eb4cbe460e7375efa9a28f82b3e34438a7bb5075a0c3d",
+    "topology.py": "1348716a6d0281461330e202281c41fa06fd0b453c797997ef83f22511a3fd71"
+  },
+  "demo_script_sha256": "e2d75ad96879ed21f0ff3d53a006e019ead4f2c38abe9758f3ded18a3a2fb604",
+  "results": [
+    {
+      "species": "Escherichia coli K-12 MG1655",
+      "assembly": "GCF_000005845.2",
+      "sequence": "NC_000913.3",
+      "sequence_length_bp": 4641652,
+      "circular": true,
+      "gene_records": 4651,
+      "gene_types": {
+        "gene": 4506,
+        "pseudogene": 145
+      },
+      "mobile_annotations_supplied": true,
+      "mobile_records": 50,
+      "gene_union_covered_bp": 4143363,
+      "window_bp": 50000,
+      "window_count": 93,
+      "local_regions": [
+        {
+          "chrom": "NC_000913.3",
+          "start": 4635652,
+          "end": 4647652,
+          "region_id": "origin_crossing",
+          "length_bp": 12000,
+          "gene_count": 14,
+          "gene_covered_bp": 10772,
+          "gene_coverage_fraction": 0.8976666666666666,
+          "te_count": 0,
+          "te_covered_bp": 0,
+          "te_coverage_fraction": 0.0
+        },
+        {
+          "chrom": "NC_000913.3",
+          "start": 9386,
+          "end": 22731,
+          "region_id": "mobile_neighborhood",
+          "length_bp": 13345,
+          "gene_count": 19,
+          "gene_covered_bp": 11151,
+          "gene_coverage_fraction": 0.8355938553765455,
+          "te_count": 2,
+          "te_covered_bp": 2113,
+          "te_coverage_fraction": 0.15833645560134882
+        }
+      ],
+      "checks": {
+        "all_genes_counted_once_on_full_chromosome": true,
+        "all_mobile_records_counted_once_on_full_chromosome": true,
+        "gene_union_matches_independent_merge": true,
+        "window_union_sums_to_full_chromosome_union": true,
+        "windows_tile_complete_chromosome": true
+      }
+    },
+    {
+      "species": "Arabidopsis thaliana / chromosome 4",
+      "assembly": "GCF_000001735.4",
+      "sequence": "NC_003075.7",
+      "sequence_length_bp": 18585056,
+      "circular": false,
+      "gene_records": 5842,
+      "gene_types": {
+        "gene": 5007,
+        "pseudogene": 835
+      },
+      "mobile_annotations_supplied": false,
+      "mobile_records": null,
+      "gene_union_covered_bp": 11878081,
+      "window_bp": 100000,
+      "window_count": 186,
+      "local_regions": [
+        {
+          "chrom": "NC_003075.7",
+          "start": 100000,
+          "end": 145000,
+          "region_id": "linear_gene_neighborhood",
+          "length_bp": 45000,
+          "gene_count": 19,
+          "gene_covered_bp": 29336,
+          "gene_coverage_fraction": 0.6519111111111111,
+          "te_count": 0,
+          "te_covered_bp": 0,
+          "te_coverage_fraction": 0.0
+        }
+      ],
+      "checks": {
+        "all_genes_counted_once_on_full_chromosome": true,
+        "all_mobile_records_counted_once_on_full_chromosome": true,
+        "gene_union_matches_independent_merge": true,
+        "window_union_sums_to_full_chromosome_union": true,
+        "windows_tile_complete_chromosome": true
+      }
+    }
+  ],
+  "interpretation": "Descriptive annotation overlap only; no biological effect or mobility inference."
+}

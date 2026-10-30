@@ -1,0 +1,3 @@
+chrom,start,end,region_id,length_bp,gene_count,gene_covered_bp,gene_coverage_fraction,te_count,te_covered_bp,te_coverage_fraction
+NC_000913.3,4635652,4647652,origin_crossing,12000,14,10772,0.8976666666666666,0,0,0.0
+NC_000913.3,9386,22731,mobile_neighborhood,13345,19,11151,0.8355938553765455,2,2113,0.15833645560134882

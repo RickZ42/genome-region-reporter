@@ -223,3 +223,7 @@ __marimo__/
 results/
 results-*/
 .DS_Store
+
+# Keep the reviewed real-data demo outputs in the repository.
+!DEMO/results/
+!DEMO/results/**

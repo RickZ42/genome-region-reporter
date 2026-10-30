@@ -1,0 +1,36 @@
+region_id,chrom,region_start,region_end,feature_type,feature_id,feature_start,feature_end,overlap_start,overlap_end,overlap_bp,feature_strand,feature_label,annotation_type
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b0001,189,255,4641841,4641907,66,+,thrL,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b0002,336,2799,4641988,4644451,2463,+,thrA,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b0003,2800,3733,4644452,4645385,933,+,thrB,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b0004,3733,5020,4645385,4646672,1287,+,thrC,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b0005,5233,5530,4646885,4647182,297,+,yaaX,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b0006,5682,6459,4647334,4647652,318,-,yaaA,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4397,4635520,4635994,4635652,4635994,342,+,creA,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4398,4636006,4636696,4636006,4636696,690,+,creB,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4399,4636695,4638120,4636695,4638120,1425,+,creC,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4400,4638177,4639530,4638177,4639530,1353,+,creD,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4401,4639589,4640306,4639589,4640306,717,-,arcA,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4402,4640401,4640542,4640401,4640542,141,+,yjjY,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4824,4640717,4640771,4640717,4640771,54,+,ytjE,gene
+origin_crossing,NC_000913.3,4635652,4647652,gene,gene-b4403,4640941,4641628,4640941,4641628,687,+,yjtD,gene
+mobile_neighborhood,NC_000913.3,9386,22731,TE,id-NC_000913.3:15387..16731,15386,16731,15386,16731,1345,+,insertion sequence:IS186A,mobile_genetic_element
+mobile_neighborhood,NC_000913.3,9386,22731,TE,id-NC_000913.3:19796..20563,19795,20563,19795,20563,768,-,insertion sequence:IS1A,mobile_genetic_element
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0009,9305,9893,9386,9893,507,+,mog,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0010,9927,10494,9927,10494,567,-,satP,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0011,10642,11356,10642,11356,714,-,yaaW,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0012,10829,11315,10829,11315,486,+,mbiA,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0013,11381,11786,11381,11786,405,-,yaaI,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0014,12162,14079,12162,14079,1917,+,dnaK,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0015,14167,15298,14167,15298,1131,+,dnaJ,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0016,15444,16557,15444,16557,1113,+,insL1,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0018,16750,16960,16750,16960,210,-,mokC,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b4412,16750,16903,16750,16903,153,-,hokC,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b4413,16951,17010,16951,17010,59,+,sokC,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0019,17488,18655,17488,18655,1167,+,nhaA,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0020,18714,19620,18714,19620,906,+,nhaR,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0021,19810,20314,19810,20314,504,-,insB1,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0022,20232,20508,20232,20508,276,-,insA1,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0023,20814,21078,20814,21078,264,-,rpsT,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0024,21180,21399,21180,21399,219,+,yaaY,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0025,21406,22348,21406,22348,942,+,ribF,gene
+mobile_neighborhood,NC_000913.3,9386,22731,gene,gene-b0026,22390,25207,22390,22731,341,+,ileS,gene

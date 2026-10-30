@@ -1,8 +1,10 @@
 """Command-line entry point for region annotation."""
 
 import argparse
+from pathlib import Path
 
 from regionreport.analysis import annotate_regions
+from regionreport.gff import MOBILE_TYPES, read_gff3
 from regionreport.io import read_bed
 from regionreport.report import write_report
 
@@ -12,18 +14,63 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="regionreport", description=__doc__)
     parser.add_argument("command", choices=["annotate"])
     parser.add_argument("--regions", required=True, help="Regions BED4 file")
-    parser.add_argument("--genes", required=True, help="Genes BED4 file")
-    parser.add_argument("--repeats", required=True, help="TE annotations BED4 file")
+    parser.add_argument("--genes", required=True, help="Genes BED4 or GFF3 file")
+    parser.add_argument("--repeats", help="Optional mobile annotations, in the chosen input format")
     parser.add_argument("--out", required=True, help="New or empty output directory")
     parser.add_argument("--no-plots", action="store_true", help="Write CSV files without PNGs")
+    parser.add_argument(
+        "--input-format",
+        choices=["bed", "gff3"],
+        default="bed",
+        help="Annotation format; --regions always uses BED4",
+    )
+    parser.add_argument("--circular", action="store_true", help="All input sequences are circular")
+    parser.add_argument("--species", help="Descriptive species/strain label; does not set topology")
+    parser.add_argument("--sequence-lengths", help="Headerless two-column sequence ID/length TSV")
+    parser.add_argument("--seqid", action="append", help="Keep this GFF3 sequence ID (repeatable)")
+    parser.add_argument("--plot-format", choices=["png", "svg", "pdf"], default="png")
     args = parser.parse_args(argv)
     try:
-        regions = read_bed(args.regions)
-        genes = read_bed(args.genes)
-        repeats = read_bed(args.repeats)
-        result = annotate_regions(regions, genes, repeats)
+        regions = read_bed(args.regions, circular=args.circular)
+        lengths = {}
+        if args.input_format == "gff3":
+            genes = read_gff3(args.genes, seqids=args.seqid)
+            repeats = (
+                read_gff3(args.repeats, feature_types=MOBILE_TYPES, seqids=args.seqid)
+                if args.repeats
+                else None
+            )
+            lengths.update(genes.attrs.get("sequence_lengths", {}))
+            if repeats is not None:
+                for chrom, length in repeats.attrs.get("sequence_lengths", {}).items():
+                    if chrom in lengths and lengths[chrom] != length:
+                        raise ValueError(f"Conflicting annotation sequence lengths: {chrom}")
+                    lengths[chrom] = length
+        else:
+            genes = read_bed(args.genes, circular=args.circular)
+            repeats = read_bed(args.repeats, circular=args.circular) if args.repeats else None
+        if args.sequence_lengths:
+            for line in Path(args.sequence_lengths).read_text(encoding="utf-8").splitlines():
+                if not line.strip() or line.lstrip().startswith("#"):
+                    continue
+                fields = line.split()
+                if len(fields) != 2:
+                    raise ValueError("Sequence lengths need two columns: sequence ID and length")
+                chrom, text_length = fields
+                length = int(text_length)
+                if chrom in lengths and lengths[chrom] != length:
+                    raise ValueError(f"Conflicting sequence length for {chrom}")
+                lengths[chrom] = length
+        result = annotate_regions(
+            regions,
+            genes,
+            repeats,
+            circular=args.circular,
+            sequence_lengths=lengths,
+            species=args.species,
+        )
         make_plots = not args.no_plots
-        directory = write_report(result, args.out, plots=make_plots)
+        directory = write_report(result, args.out, plots=make_plots, plot_format=args.plot_format)
     except (OSError, ValueError) as error:
         parser.error(str(error))
     print(f"Annotated {len(result.summary)} regions. Report: {directory.resolve()}")
